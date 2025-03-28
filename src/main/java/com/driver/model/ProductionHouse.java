@@ -17,7 +17,7 @@ public class ProductionHouse {
 
     private double ratings;
 
-    @OneToMany(mappedBy = "productionHouse",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "productionHouse", cascade = CascadeType.ALL)
     private List<WebSeries> webSeriesList;
 
     public ProductionHouse(String name) {
@@ -58,5 +58,20 @@ public class ProductionHouse {
 
     public void setRatings(double ratings) {
         this.ratings = ratings;
+    }
+
+    public void setAverageRating(double averageRating) {
+        this.ratings = averageRating;
+    }
+
+    // 🔥 New method to update the average rating of the production house
+    public void updateAverageRating() {
+        if (webSeriesList != null && !webSeriesList.isEmpty()) {
+            double totalRating = 0;
+            for (WebSeries series : webSeriesList) {
+                totalRating += series.getRating();
+            }
+            this.ratings = totalRating / webSeriesList.size();
+        }
     }
 }

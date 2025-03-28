@@ -1,14 +1,6 @@
 package com.driver.model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import java.util.List;
+import javax.persistence.*;
 
 @Entity
 @Table(name="user")
@@ -19,13 +11,14 @@ public class User {
     private int id;
 
     private String name;
-
     private int age;
-
     private String mobNo;
 
-    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)  // ✅ Changed from "user" to "customer"
     private Subscription subscription;
+
+    // Constructors
+    public User() {}
 
     public User(int id, String name, int age, String mobNo) {
         this.id = id;
@@ -40,51 +33,19 @@ public class User {
         this.mobNo = mobNo;
     }
 
-    public User(int id, String name, int age, String mobNo, Subscription subscription) {
-        this(id, name,age, mobNo);
-        this.subscription = subscription;
-    }
+    // Getters and Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public User() {
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public int getId() {
-        return id;
-    }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getMobNo() { return mobNo; }
+    public void setMobNo(String mobNo) { this.mobNo = mobNo; }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getMobNo() {
-        return mobNo;
-    }
-
-    public void setMobNo(String mobNo) {
-        this.mobNo = mobNo;
-    }
-
-    public Subscription getSubscription() {
-        return subscription;
-    }
-
-    public void setSubscription(Subscription subscription) {
-        this.subscription = subscription;
-    }
+    public Subscription getSubscription() { return subscription; }
+    public void setSubscription(Subscription subscription) { this.subscription = subscription; }
 }

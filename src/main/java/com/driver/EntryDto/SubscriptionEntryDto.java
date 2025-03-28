@@ -15,6 +15,10 @@ public class SubscriptionEntryDto {
         this.noOfScreensRequired = noOfScreensRequired;
     }
 
+    public SubscriptionEntryDto() {
+
+    }
+
     public int getUserId() {
         return userId;
     }

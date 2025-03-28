@@ -1,6 +1,5 @@
 package com.driver.services;
 
-
 import com.driver.EntryDto.SubscriptionEntryDto;
 import com.driver.model.Subscription;
 import com.driver.model.SubscriptionType;
@@ -10,7 +9,6 @@ import com.driver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -22,28 +20,82 @@ public class SubscriptionService {
     @Autowired
     UserRepository userRepository;
 
-    public Integer buySubscription(SubscriptionEntryDto subscriptionEntryDto){
+    public Integer buySubscription(SubscriptionEntryDto subscriptionEntryDto) {
+        // Fetch the user from the repository
+        User user = userRepository.findById(subscriptionEntryDto.getUserId()).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("User not found!");
+        }
 
-        //Save The subscription Object into the Db and return the total Amount that user has to pay
+        // Calculate cost based on subscription type and number of screens
+        int cost = calculateCost(subscriptionEntryDto.getSubscriptionType(), subscriptionEntryDto.getNoOfScreensRequired());
 
-        return null;
+        // Create and save subscription
+        Subscription subscription = new Subscription(
+                subscriptionEntryDto.getSubscriptionType(),
+                subscriptionEntryDto.getNoOfScreensRequired(),
+                new java.util.Date(),
+                cost,
+                user
+        );
+
+        subscriptionRepository.save(subscription);
+        return cost; // Return total amount to be paid
     }
 
-    public Integer upgradeSubscription(Integer userId)throws Exception{
+    public Integer upgradeSubscription(Integer userId) throws Exception {
+        // Fetch the user and subscription
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new RuntimeException("User not found!");
+        }
 
-        //If you are already at an ElITE subscription : then throw Exception ("Already the best Subscription")
-        //In all other cases just try to upgrade the subscription and tell the difference of price that user has to pay
-        //update the subscription in the repository
+        Subscription subscription = subscriptionRepository.findByCustomer(user);
+        if (subscription == null) {
+            throw new RuntimeException("Subscription not found for user!");
+        }
 
-        return null;
+        // Check if already on ELITE plan
+        if (subscription.getSubscriptionType() == SubscriptionType.ELITE) {
+            throw new Exception("Already the best Subscription");
+        }
+
+        // Determine the upgraded subscription type
+        SubscriptionType upgradedType = subscription.getSubscriptionType() == SubscriptionType.BASIC
+                ? SubscriptionType.PRO
+                : SubscriptionType.ELITE;
+
+        // Calculate the new cost
+        int newCost = calculateCost(upgradedType, subscription.getNoOfScreensSubscribed());
+        int priceDifference = newCost - subscription.getTotalAmountPaid();
+
+        // Update subscription
+        subscription.setSubscriptionType(upgradedType);
+        subscription.setTotalAmountPaid(newCost);
+        subscriptionRepository.save(subscription);
+
+        return priceDifference; // Return additional amount to be paid
     }
 
-    public Integer calculateTotalRevenueOfHotstar(){
-
-        //We need to find out total Revenue of hotstar : from all the subscriptions combined
-        //Hint is to use findAll function from the SubscriptionDb
-
-        return null;
+    public Integer calculateTotalRevenueOfHotstar() {
+        List<Subscription> subscriptions = subscriptionRepository.findAll();
+        int totalRevenue = 0;
+        for (Subscription subscription : subscriptions) {
+            totalRevenue += subscription.getTotalAmountPaid();
+        }
+        return totalRevenue;
     }
 
+    private int calculateCost(SubscriptionType type, int screens) {
+        switch (type) {
+            case BASIC:
+                return 500 + (200 * screens);
+            case PRO:
+                return 800 + (250 * screens);
+            case ELITE:
+                return 1000 + (350 * screens);
+            default:
+                return 0;
+        }
+    }
 }
