@@ -14,7 +14,7 @@ public class User {
     private int age;
     private String mobNo;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)  // ✅ Changed from "user" to "customer"
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)  // Changed from "user" to "customer"
     private Subscription subscription;
 
     // Constructors

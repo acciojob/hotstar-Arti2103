@@ -64,7 +64,7 @@ public class ProductionHouse {
         this.ratings = averageRating;
     }
 
-    // 🔥 New method to update the average rating of the production house
+    //  New method to update the average rating of the production house
     public void updateAverageRating() {
         if (webSeriesList != null && !webSeriesList.isEmpty()) {
             double totalRating = 0;
