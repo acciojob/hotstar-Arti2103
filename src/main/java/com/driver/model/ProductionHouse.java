@@ -74,4 +74,7 @@ public class ProductionHouse {
             this.ratings = totalRating / webSeriesList.size();
         }
     }
+
+    public void setAvgRating(double v) {
+    }
 }

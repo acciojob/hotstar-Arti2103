@@ -2,6 +2,8 @@ package com.driver.test;
 
 import com.driver.EntryDto.ProductionHouseEntryDto;
 import com.driver.model.ProductionHouse;
+import com.driver.model.Subscription;
+import com.driver.model.User;
 import com.driver.repository.ProductionHouseRepository;
 import com.driver.services.ProductionHouseService;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,5 @@
 package com.driver.services;
 
-
 import com.driver.EntryDto.ProductionHouseEntryDto;
 import com.driver.model.ProductionHouse;
 import com.driver.repository.ProductionHouseRepository;
@@ -13,11 +12,16 @@ public class ProductionHouseService {
     @Autowired
     ProductionHouseRepository productionHouseRepository;
 
-    public Integer addProductionHouseToDb(ProductionHouseEntryDto productionHouseEntryDto){
+    public Integer addProductionHouseToDb(ProductionHouseEntryDto productionHouseEntryDto) {
+        // 1️⃣ ProductionHouse entity ka object banao
+        ProductionHouse productionHouse = new ProductionHouse();
+        productionHouse.setName(productionHouseEntryDto.getName());
+        productionHouse.setAvgRating(4.5); // Default rating
 
-        return  null;
+        // 2️⃣ Database me save karo
+        productionHouse = productionHouseRepository.save(productionHouse);
+
+        // 3️⃣ Inserted row ka ID return karo
+        return productionHouse.getId();
     }
-
-
-
 }

@@ -22,6 +22,7 @@ public class SubscriptionService {
 
     public Integer buySubscription(SubscriptionEntryDto subscriptionEntryDto) {
         // Fetch the user from the repository
+        System.out.println("User ID received: " + subscriptionEntryDto.getUserId());
         User user = userRepository.findById(subscriptionEntryDto.getUserId()).orElse(null);
         if (user == null) {
             throw new RuntimeException("User not found!");

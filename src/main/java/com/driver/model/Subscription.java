@@ -35,6 +35,13 @@ public class Subscription {
         this.totalAmountPaid = totalAmountPaid;
         this.customer = customer;
     }
+    public Subscription(SubscriptionType subscriptionType, int noOfScreensSubscribed, Date startSubscriptionDate, int totalAmountPaid) {
+        this.subscriptionType = subscriptionType;
+        this.noOfScreensSubscribed = noOfScreensSubscribed;
+        this.startSubscriptionDate = startSubscriptionDate;
+        this.totalAmountPaid = totalAmountPaid;
+    }
+
 
     // Getters and Setters
     public int getId() { return id; }

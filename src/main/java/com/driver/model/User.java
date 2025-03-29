@@ -14,6 +14,7 @@ public class User {
     private int age;
     private String mobNo;
 
+
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)  // Changed from "user" to "customer"
     private Subscription subscription;
 
@@ -32,6 +33,13 @@ public class User {
         this.age = age;
         this.mobNo = mobNo;
     }
+    public User(int id, String name, int age, Subscription subscription) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.subscription = subscription;
+    }
+
 
     // Getters and Setters
     public int getId() { return id; }
