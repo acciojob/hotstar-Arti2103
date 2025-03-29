@@ -8,7 +8,6 @@ import com.driver.repository.WebSeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.List;
 
 @Service
@@ -27,12 +26,14 @@ public class WebSeriesService {
             throw new Exception("Series is already present");
         }
 
-        // Retrieve the production house from the database
-        Optional<ProductionHouse> optionalProductionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId());
-        if (!optionalProductionHouse.isPresent()) {
-            throw new Exception("Production House not found");
+        //  First check if the Production House exists
+        if (!productionHouseRepository.existsById(webSeriesEntryDto.getProductionHouseId())) {
+            throw new Exception("Production House not found in the system");
         }
-        ProductionHouse productionHouse = optionalProductionHouse.get();
+
+        // Retrieve the production house from the database
+        ProductionHouse productionHouse = productionHouseRepository.findById(webSeriesEntryDto.getProductionHouseId())
+                .orElseThrow(() -> new Exception("Production House not found"));
 
         // Create a new WebSeries object
         WebSeries newWebSeries = new WebSeries(
@@ -43,7 +44,7 @@ public class WebSeriesService {
                 productionHouse
         );
 
-        // Save the new WebSeries
+        // Save the new WebSeries first
         webSeriesRepository.save(newWebSeries);
 
         // Update the production house rating

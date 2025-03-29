@@ -13,15 +13,15 @@ public class ProductionHouseService {
     ProductionHouseRepository productionHouseRepository;
 
     public Integer addProductionHouseToDb(ProductionHouseEntryDto productionHouseEntryDto) {
-        // 1️⃣ ProductionHouse entity ka object banao
+        // 1 ProductionHouse entity ka object banao
         ProductionHouse productionHouse = new ProductionHouse();
         productionHouse.setName(productionHouseEntryDto.getName());
         productionHouse.setAvgRating(4.5); // Default rating
 
-        // 2️⃣ Database me save karo
+        // 2 Database me save karo
         productionHouse = productionHouseRepository.save(productionHouse);
 
-        // 3️⃣ Inserted row ka ID return karo
+        // 3 Inserted row ka ID return karo
         return productionHouse.getId();
     }
 }

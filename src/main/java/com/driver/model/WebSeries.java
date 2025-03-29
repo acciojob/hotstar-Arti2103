@@ -24,7 +24,9 @@ public class WebSeries {
     @ManyToOne
     @JoinColumn
     private ProductionHouse productionHouse;
-
+    public WebSeries() {
+        // Default constructor required by JPA
+    }
     public WebSeries(String seriesName, int ageLimit, double rating, SubscriptionType subscriptionType) {
         this.seriesName = seriesName;
         this.ageLimit = ageLimit;

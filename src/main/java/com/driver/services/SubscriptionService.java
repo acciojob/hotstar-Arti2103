@@ -9,52 +9,57 @@ import com.driver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class SubscriptionService {
 
     @Autowired
-    SubscriptionRepository subscriptionRepository;
+    private SubscriptionRepository subscriptionRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    private static final Logger logger = Logger.getLogger(SubscriptionService.class.getName());
 
     public Integer buySubscription(SubscriptionEntryDto subscriptionEntryDto) {
-        // Fetch the user from the repository
-        System.out.println("User ID received: " + subscriptionEntryDto.getUserId());
-        User user = userRepository.findById(subscriptionEntryDto.getUserId()).orElse(null);
-        if (user == null) {
-            throw new RuntimeException("User not found!");
-        }
+        logger.info("Processing buySubscription for User ID: " + subscriptionEntryDto.getUserId());
 
-        // Calculate cost based on subscription type and number of screens
+        // Fetch user from the repository
+        User user = userRepository.findById(subscriptionEntryDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        // Calculate subscription cost
         int cost = calculateCost(subscriptionEntryDto.getSubscriptionType(), subscriptionEntryDto.getNoOfScreensRequired());
 
-        // Create and save subscription
+        // Create new subscription
         Subscription subscription = new Subscription(
                 subscriptionEntryDto.getSubscriptionType(),
                 subscriptionEntryDto.getNoOfScreensRequired(),
-                new java.util.Date(),
+                new Date(),
                 cost,
                 user
         );
 
+        // Save subscription
         subscriptionRepository.save(subscription);
-        return cost; // Return total amount to be paid
+        logger.info("Subscription purchased successfully. Amount Paid: " + cost);
+        return cost;
     }
 
     public Integer upgradeSubscription(Integer userId) throws Exception {
-        // Fetch the user and subscription
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            throw new RuntimeException("User not found!");
-        }
+        logger.info("Processing upgradeSubscription for User ID: " + userId);
 
-        Subscription subscription = subscriptionRepository.findByCustomer(user);
-        if (subscription == null) {
-            throw new RuntimeException("Subscription not found for user!");
-        }
+        // Fetch user
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+
+        // Fetch subscription
+        Subscription subscription = Optional.ofNullable(subscriptionRepository.findByCustomer(user))
+                .orElseThrow(() -> new RuntimeException("Subscription not found for user!"));
 
         // Check if already on ELITE plan
         if (subscription.getSubscriptionType() == SubscriptionType.ELITE) {
@@ -62,29 +67,28 @@ public class SubscriptionService {
         }
 
         // Determine the upgraded subscription type
-        SubscriptionType upgradedType = subscription.getSubscriptionType() == SubscriptionType.BASIC
+        SubscriptionType upgradedType = (subscription.getSubscriptionType() == SubscriptionType.BASIC)
                 ? SubscriptionType.PRO
                 : SubscriptionType.ELITE;
 
-        // Calculate the new cost
+        // Calculate the new cost and price difference
         int newCost = calculateCost(upgradedType, subscription.getNoOfScreensSubscribed());
         int priceDifference = newCost - subscription.getTotalAmountPaid();
 
-        // Update subscription
+        // Update subscription details
         subscription.setSubscriptionType(upgradedType);
         subscription.setTotalAmountPaid(newCost);
         subscriptionRepository.save(subscription);
 
-        return priceDifference; // Return additional amount to be paid
+        logger.info("Subscription upgraded successfully. Additional Amount Paid: " + priceDifference);
+        return priceDifference;
     }
 
     public Integer calculateTotalRevenueOfHotstar() {
-        List<Subscription> subscriptions = subscriptionRepository.findAll();
-        int totalRevenue = 0;
-        for (Subscription subscription : subscriptions) {
-            totalRevenue += subscription.getTotalAmountPaid();
-        }
-        return totalRevenue;
+        logger.info("Calculating total revenue of Hotstar...");
+        return subscriptionRepository.findAll().stream()
+                .mapToInt(Subscription::getTotalAmountPaid)
+                .sum();
     }
 
     private int calculateCost(SubscriptionType type, int screens) {
@@ -96,7 +100,7 @@ public class SubscriptionService {
             case ELITE:
                 return 1000 + (350 * screens);
             default:
-                return 0;
+                throw new IllegalArgumentException("Invalid subscription type: " + type);
         }
     }
 }
